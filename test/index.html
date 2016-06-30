@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>De264 unit test</title>
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.23.1.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<script src="https://code.jquery.com/qunit/qunit-1.23.1.js"></script>
+<script src="../build/de264.min.js"></script>
+<script>
+
+    var decoder = de264.create();
+
+    QUnit.test( "Parse pps", function( assert ) {
+        var buf = new Uint8Array([0, 0, 0, 1, 103, 66, 192, 30, 218, 2, 144, 65, 228, 158, 16, 0, 0, 3, 0, 16, 0, 0, 3, 3, 40, 241, 98, 234]);
+        var nal = decoder.decodeNal(buf.buffer);
+        assert.equal(nal.forbidden_zero_bit, 0, "We expect forbidden_zero_bit to be 0" );
+        assert.equal(nal.nal_unit_type, 7, "We expect nal_unit_type to be 7" );
+
+        var buf = new Uint8Array([0, 0, 0, 1, 104, 206, 4, 114]);
+        var nal = decoder.decodeNal(buf.buffer);
+        var buf = new Uint8Array([0, 0, 1, 101, 136, 132, 24, 255, 255, 225, 138, 138, 0, 4, 63, 128, 25, 247, 245, 157, 128, 25, 72, 155, 126, 126, 223, 58, 90, 76, 62, 2, 255, 243, 41, 211, 125, 124, 234, 216, 211, 111, 203, 191, 225, 214, 3, 23, 199, 109, 173, 64, 85, 223, 131, 16, 3, 35, 250, 141, 127, 235, 163, 12, 64, 173, 87, 187, 190, 179, 107, 116, 111, 253, 125, 254, 181, 50, 127, 255, 255, 143, 255, 255, 8, 33, 192, 25, 72, 155, 126, 126, 223, 76, 167, 77, 245, 243, 191, 226]);
+        var nal = decoder.decodeNal(buf.buffer);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "de264.js",
+  "description": "javascript h.264 decoder",
+  "main": "main.js",
+  "authors": [
+    "guodong"
+  ],
+  "license": "BSD-2-Clause",
+  "keywords": [
+    "de264.js"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "almond": "^0.3.2",
+    "requirejs": "^2.2.0"
+  }
+}

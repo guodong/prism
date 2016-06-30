@@ -1,0 +1,29 @@
+{
+  "name": "prism",
+  "version": "1.0.0",
+  "description": "javascript h.264 decoder",
+  "main": "prism.js",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guodong/prism.git"
+  },
+  "keywords": [
+    "de264.js"
+  ],
+  "author": "guodong",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/guodong/prism/issues"
+  },
+  "homepage": "https://github.com/guodong/prism#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-connect": "^1.0.2",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-requirejs": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0"
+  }
+}
