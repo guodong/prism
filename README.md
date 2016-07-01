@@ -33,7 +33,7 @@ ws.onmessage = function(msg) {
   console.log(prism.SCb, prism.SCr) //decoded frame chroma cb/cr in xy format
 }
 ```
-The demo effect of prism is available at [CloudwareHub](http://www.cloudwarehub.com).
+The demo of prism is available at [CloudwareHub](http://www.cloudwarehub.com).
 ## License
 BSD-2-Clause
 
