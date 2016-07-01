@@ -2509,6 +2509,9 @@ define([
 
             }
         },
+        interChromaPredict: function() {
+
+        },
         decode: function() {
             var QPY = this.decoder.pps.pic_init_qp_minus26 + 26 + this.slice.slice_qp_delta;
             if (this.mbaddr !== this.slice.first_mb_in_slice) {
@@ -2522,94 +2525,9 @@ define([
 
                 this.intraChromaPredict();
             } else { /* P_MB */
-                this.interPrediction();
-                // for (var blk = 0; blk < 16; blk++) {
-                //     this.processLumaResidual(blk);
-                // }
-                //if (0) {
-                var qpY = this.decoder.pps.pic_init_qp_minus26 + 26 + this.slice.slice_qp_delta;
-                if (this.mbaddr !== this.slice.first_mb_in_slice) {
-                    qpY = (this.slice.decoder.mbs[this.mbaddr - 1].QPY + this.mb_qp_delta + 52) % 52;
-                }
-                this.QPY = qpY;
-                for (var blk = 0; blk < 16; blk++) {
-                    var data = this.getBlockData(blk);
-                    if ((this.CodedBlockPattenLuma & (1 << (blk >> 2)))) {
-                        var lumas = this.LumaLevel[blk];
+                this.interPredict();
 
-                        var c = _common.inverseScanTransformCoeff(lumas);
-                        // [
-                        //     [lumas[0], lumas[1], lumas[5], lumas[6]],
-                        //     [lumas[2], lumas[4], lumas[7], lumas[12]],
-                        //     [lumas[3], lumas[8], lumas[11], lumas[13]],
-                        //     [lumas[9], lumas[10], lumas[14], lumas[15]]
-                        // ];
-
-
-                        var d = [
-                            [0, 0, 0, 0],
-                            [0, 0, 0, 0],
-                            [0, 0, 0, 0],
-                            [0, 0, 0, 0]
-                        ];
-                        for (var i = 0; i < 4; i++) {
-                            for (var j = 0; j < 4; j++) {
-                                d[i][j] = (c[i][j] * _common.LevelScale(qpY % 6, i, j)) << Math.floor(qpY / 6);
-                            }
-                        }
-
-                        var e = [
-                            [d[0][0] + d[0][2], d[0][0] - d[0][2], (d[0][1] >> 1) - d[0][3], d[0][1] + (d[0][3] >> 1)],
-                            [d[1][0] + d[1][2], d[1][0] - d[1][2], (d[1][1] >> 1) - d[1][3], d[1][1] + (d[1][3] >> 1)],
-                            [d[2][0] + d[2][2], d[2][0] - d[2][2], (d[2][1] >> 1) - d[2][3], d[2][1] + (d[2][3] >> 1)],
-                            [d[3][0] + d[3][2], d[3][0] - d[3][2], (d[3][1] >> 1) - d[3][3], d[3][1] + (d[3][3] >> 1)],
-                        ];
-
-                        var f = [
-                            [e[0][0] + e[0][3], e[0][1] + e[0][2], e[0][1] - e[0][2], e[0][0] - e[0][3]],
-                            [e[1][0] + e[1][3], e[1][1] + e[1][2], e[1][1] - e[1][2], e[1][0] - e[1][3]],
-                            [e[2][0] + e[2][3], e[2][1] + e[2][2], e[2][1] - e[2][2], e[2][0] - e[2][3]],
-                            [e[3][0] + e[3][3], e[3][1] + e[3][2], e[3][1] - e[3][2], e[3][0] - e[3][3]],
-                        ];
-
-                        var g = [
-                            [f[0][0] + f[2][0], f[0][1] + f[2][1], f[0][2] + f[2][2], f[0][3] + f[2][3]],
-                            [f[0][0] - f[2][0], f[0][1] - f[2][1], f[0][2] - f[2][2], f[0][3] - f[2][3]],
-                            [(f[1][0] >> 1) - f[3][0], (f[1][1] >> 1) - f[3][1], (f[1][2] >> 1) - f[3][2], (f[1][3] >> 1) - f[3][3]],
-                            [f[1][0] + (f[3][0] >> 1), f[1][1] + (f[3][1] >> 1), f[1][2] + (f[3][2] >> 1), f[1][3] + (f[3][3] >> 1)]
-                        ];
-
-                        var h = [
-                            [g[0][0] + g[3][0], g[0][1] + g[3][1], g[0][2] + g[3][2], g[0][3] + g[3][3]],
-                            [g[1][0] + g[2][0], g[1][1] + g[2][1], g[1][2] + g[2][2], g[1][3] + g[2][3]],
-                            [g[1][0] - g[2][0], g[1][1] - g[2][1], g[1][2] - g[2][2], g[1][3] - g[2][3]],
-                            [g[0][0] - g[3][0], g[0][1] - g[3][1], g[0][2] - g[3][2], g[0][3] - g[3][3]],
-                        ];
-
-                        var r = [];
-                        for (var i = 0; i < 4; i++) {
-                            r[i] = [];
-                            for (var j = 0; j < 4; j++) {
-                                r[i][j] = (h[i][j] + 32) >> 6;
-                            }
-                        }
-                        for (var i = 0; i < 4; i++) {
-                            for (var j = 0; j < 4; j++) {
-                                data[j][i] += r[i][j];
-                                if (data[j][i] < 0) {
-                                    data[j][i] = 0;
-                                }
-                                if (data[j][i] > 255) {
-                                    data[j][i] = 255;
-                                }
-                            }
-                        }
-                    }
-                    this.writeBlockToLuma(data, blk, 1);
-
-                    this.writeLumaToSample(blk, data, 1);
-                }
-                //}
+                this.interChromaPredict();
             }
 
         },
@@ -2676,7 +2594,7 @@ define([
                 return this.deriveLumaMvAndRefIdxSkip();
             }
         },
-        interPrediction: function() {
+        interPredict: function() {
             var row = Math.floor(this.mbaddr / this.decoder.widthInMb);
             var col = (this.mbaddr - row * this.decoder.widthInMb);
             row = row << 4;
@@ -2802,6 +2720,77 @@ define([
                         }
                     }
                     break;
+            }
+            /* below is residual */
+            for (var blk = 0; blk < 16; blk++) {
+                var data = this.getBlockData(blk);
+                if ((this.CodedBlockPattenLuma & (1 << (blk >> 2)))) {
+                    var lumas = this.LumaLevel[blk];
+
+                    var c = _common.inverseScanTransformCoeff(lumas);
+
+                    var d = [
+                        [0, 0, 0, 0],
+                        [0, 0, 0, 0],
+                        [0, 0, 0, 0],
+                        [0, 0, 0, 0]
+                    ];
+                    for (var i = 0; i < 4; i++) {
+                        for (var j = 0; j < 4; j++) {
+                            d[i][j] = (c[i][j] * _common.LevelScale(this.QPY % 6, i, j)) << Math.floor(this.QPY / 6);
+                        }
+                    }
+
+                    var e = [
+                        [d[0][0] + d[0][2], d[0][0] - d[0][2], (d[0][1] >> 1) - d[0][3], d[0][1] + (d[0][3] >> 1)],
+                        [d[1][0] + d[1][2], d[1][0] - d[1][2], (d[1][1] >> 1) - d[1][3], d[1][1] + (d[1][3] >> 1)],
+                        [d[2][0] + d[2][2], d[2][0] - d[2][2], (d[2][1] >> 1) - d[2][3], d[2][1] + (d[2][3] >> 1)],
+                        [d[3][0] + d[3][2], d[3][0] - d[3][2], (d[3][1] >> 1) - d[3][3], d[3][1] + (d[3][3] >> 1)],
+                    ];
+
+                    var f = [
+                        [e[0][0] + e[0][3], e[0][1] + e[0][2], e[0][1] - e[0][2], e[0][0] - e[0][3]],
+                        [e[1][0] + e[1][3], e[1][1] + e[1][2], e[1][1] - e[1][2], e[1][0] - e[1][3]],
+                        [e[2][0] + e[2][3], e[2][1] + e[2][2], e[2][1] - e[2][2], e[2][0] - e[2][3]],
+                        [e[3][0] + e[3][3], e[3][1] + e[3][2], e[3][1] - e[3][2], e[3][0] - e[3][3]],
+                    ];
+
+                    var g = [
+                        [f[0][0] + f[2][0], f[0][1] + f[2][1], f[0][2] + f[2][2], f[0][3] + f[2][3]],
+                        [f[0][0] - f[2][0], f[0][1] - f[2][1], f[0][2] - f[2][2], f[0][3] - f[2][3]],
+                        [(f[1][0] >> 1) - f[3][0], (f[1][1] >> 1) - f[3][1], (f[1][2] >> 1) - f[3][2], (f[1][3] >> 1) - f[3][3]],
+                        [f[1][0] + (f[3][0] >> 1), f[1][1] + (f[3][1] >> 1), f[1][2] + (f[3][2] >> 1), f[1][3] + (f[3][3] >> 1)]
+                    ];
+
+                    var h = [
+                        [g[0][0] + g[3][0], g[0][1] + g[3][1], g[0][2] + g[3][2], g[0][3] + g[3][3]],
+                        [g[1][0] + g[2][0], g[1][1] + g[2][1], g[1][2] + g[2][2], g[1][3] + g[2][3]],
+                        [g[1][0] - g[2][0], g[1][1] - g[2][1], g[1][2] - g[2][2], g[1][3] - g[2][3]],
+                        [g[0][0] - g[3][0], g[0][1] - g[3][1], g[0][2] - g[3][2], g[0][3] - g[3][3]],
+                    ];
+
+                    var r = [];
+                    for (var i = 0; i < 4; i++) {
+                        r[i] = [];
+                        for (var j = 0; j < 4; j++) {
+                            r[i][j] = (h[i][j] + 32) >> 6;
+                        }
+                    }
+                    for (var i = 0; i < 4; i++) {
+                        for (var j = 0; j < 4; j++) {
+                            data[j][i] += r[i][j];
+                            if (data[j][i] < 0) {
+                                data[j][i] = 0;
+                            }
+                            if (data[j][i] > 255) {
+                                data[j][i] = 255;
+                            }
+                        }
+                    }
+                }
+                this.writeBlockToLuma(data, blk, 1);
+
+                this.writeLumaToSample(blk, data, 1);
             }
         },
         lumaSampleInterpolation: function(xInt, yInt, xFrac, yFrac, flag) {

@@ -1,5 +1,5 @@
 {
-  "name": "de264.js",
+  "name": "prism",
   "description": "javascript h.264 decoder",
   "main": "main.js",
   "authors": [
@@ -7,7 +7,7 @@
   ],
   "license": "BSD-2-Clause",
   "keywords": [
-    "de264.js"
+    "prism"
   ],
   "homepage": "",
   "ignore": [

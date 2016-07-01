@@ -1,2 +1,1 @@
-# prism
-H.264 decoder in pure javascript
+# prism - H.264 decoder in javascript
