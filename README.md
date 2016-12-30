@@ -25,7 +25,7 @@ $ grunt
 ## Usage
 
 Prism uses [requirejs/almod](https://github.com/requirejs/almond) to package, and export `window.prism` if not in AMD context.
-The typical usage of prism should work with websocket, just read raw H.264 nal data from server via websocket and feed into prism, than prism will decode every frame into RGBA/YCbCr format pictures.
+The typical usage of prism should work with websocket, just read raw H.264 nal data from server via websocket and feed into prism, then prism will decode every frame into RGBA/YCbCr format pictures.
 Sample code is as follows:
 ```
 ws.onmessage = function(msg) {
